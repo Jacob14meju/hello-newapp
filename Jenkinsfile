@@ -4,7 +4,6 @@ def artifactory = "docker.io"
 def appimage = "docker.io/${repo}/${appname}"
 def apptag = "${env.BUILD_NUMBER}"
 def DEPLOY = true
-def currentDir = "${env.WORKSPACE}"
 
 podTemplate(containers: [
       containerTemplate(name: 'jnlp', image: 'jenkins/inbound-agent', ttyEnabled: true),
@@ -24,7 +23,7 @@ podTemplate(containers: [
         stage('build') {
             container('docker') {
               echo "Building docker image..."
-              sh "/kaniko/executor --force --context ${currentDir} --dockerfile Dockerfile --destination ${appimage}:${apptag} --cache=true"
+              sh "/kaniko/executor --force --context . --dockerfile Dockerfile --destination ${appimage}:${apptag} --cache=true"
             }
         } //end build
         stage('deploy') {
