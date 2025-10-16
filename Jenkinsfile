@@ -4,6 +4,7 @@ def artifactory = "docker.io"
 def appimage = "docker.io/${repo}/${appname}"
 def apptag = "${env.BUILD_NUMBER}"
 def DEPLOY = true
+def currentDir = "${env.WORKSPACE}"
 
 podTemplate(containers: [
       containerTemplate(name: 'jnlp', image: 'jenkins/inbound-agent', ttyEnabled: true),
