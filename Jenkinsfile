@@ -23,7 +23,7 @@ podTemplate(containers: [
         stage('build') {
             container('docker') {
               echo "Building docker image..."
-              sh "/kaniko/executor --force --context 'pwd' --dockerfile 'Dockerfile' --destination "${appimage}:${apptag}" --cache=true"
+              sh "/kaniko/executor --force --context $(pwd) --dockerfile Dockerfile --destination ${appimage}:${apptag} --cache=true"
             }
         } //end build
         stage('deploy') {
