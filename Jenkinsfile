@@ -29,7 +29,8 @@ podTemplate(containers: [
                   --context `pwd` \
                   --dockerfile Dockerfile \
                   --destination ${appimage}:${apptag} \
-                  --cache=true
+                  --cache=true \
+                  --docker-config=/kaniko/.docker/
                   """
             }
         } //end build
