@@ -23,17 +23,18 @@ podTemplate(containers: [
         stage('build') {
             container('docker') {
               echo "Building docker image..."
-	      echo "Original step was using docker for build."
-	      echo "You will need to use kaniko instead"
-              sh "echo docker build -t $appimage --no-cache ."
-              sh "echo docker login $artifactory -u admin -p password"
-              sh "echo docker push $appimage"
+              sh "/kaniko/executor --force --context 'pwd' --dockerfile 'Dockerfile' --destination "${appimage}:${apptag}" --cache=true"
             }
         } //end build
         stage('deploy') {
-                    container('docker') {
+              container('docker') {
 	              if (DEPLOY) {
                         echo "***** Doing some deployment stuff *********"
+                        sh """
+                          kubectl set image deployment/hello-newapp \
+                          hello-newapp=${appimage}:${apptag} \
+                          --namespace default
+                    """
                     }  else {
                         echo "***** NO DEPLOY - Doing somthing else. Testing? *********"
                     }
