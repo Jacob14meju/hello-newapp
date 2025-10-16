@@ -7,7 +7,7 @@ def DEPLOY = true
 
 podTemplate(containers: [
       containerTemplate(name: 'jnlp', image: 'jenkins/inbound-agent', ttyEnabled: true),
-      containerTemplate(name: 'docker', image: 'gcr.io/kaniko-project/executor:debug-v0.19.0', command: "/busybox/cat", ttyEnabled: true)
+      containerTemplate(name: 'docker', image: 'gcr.io/kaniko-project/executor:debug-v1.23.2', command: "/busybox/cat", ttyEnabled: true)
   ],
   volumes: [
      configMapVolume(mountPath: '/kaniko/.docker/', configMapName: 'docker-cred')
