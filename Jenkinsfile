@@ -17,7 +17,8 @@ podTemplate(containers: [
             sh '/usr/bin/git config --global http.sslVerify false'
 	    checkout scm
           }
-        } // end chackout
+        }
+     } // end chackout
 
         stage('build') {
             container('docker') {
