@@ -3,6 +3,7 @@ def repo = "elevy99927"  // Replace with your DockerHub username
 def artifactory = "docker.io" 
 def appimage = "docker.io/${repo}/${appname}"
 def apptag = "${env.BUILD_NUMBER}"
+def DEPLOY = true
 
 podTemplate(containers: [
       containerTemplate(name: 'jnlp', image: 'jenkins/inbound-agent', ttyEnabled: true),
@@ -12,13 +13,12 @@ podTemplate(containers: [
      configMapVolume(mountPath: '/kaniko/.docker/', configMapName: 'docker-cred')
   ])  {
     node(POD_LABEL) {
-        stage('chackout') {
+        stage('checkout') {
             container('jnlp') {
             sh '/usr/bin/git config --global http.sslVerify false'
 	    checkout scm
           }
-        }
-     } // end chackout
+        } // end chackout
 
         stage('build') {
             container('docker') {
@@ -30,3 +30,14 @@ podTemplate(containers: [
               sh "echo docker push $appimage"
             }
         } //end build
+        stage('deploy') {
+                    container('docker') {
+	              if (DEPLOY) {
+                        echo "***** Doing some deployment stuff *********"
+                    }  else {
+                        echo "***** NO DEPLOY - Doing somthing else. Testing? *********"
+                    }
+                  }
+                } //end deploy
+                } // end node
+} // end podTemplate
