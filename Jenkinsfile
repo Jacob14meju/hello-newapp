@@ -7,7 +7,7 @@ def DEPLOY = true
 
 podTemplate(containers: [
       containerTemplate(name: 'jnlp', image: 'jenkins/inbound-agent', ttyEnabled: true),
-      containerTemplate(name: 'docker', image: 'gcr.io/kaniko-project/executor:v1.23.2', command: "/busybox/cat", ttyEnabled: true)
+      containerTemplate(name: 'docker', image: 'gcr.io/kaniko-project/executor:debug-v0.19.0', command: "/busybox/cat", ttyEnabled: true)
   ],
   volumes: [
      configMapVolume(mountPath: '/kaniko/.docker/', configMapName: 'docker-cred')
@@ -15,7 +15,7 @@ podTemplate(containers: [
     node(POD_LABEL) {
         stage('checkout') {
             container('jnlp') {
-            sh '/usr/bin/git config --global http.sslVerify false'
+              sh '/usr/bin/git config --global http.sslVerify false'
 	    checkout scm
           }
         } // end chackout
@@ -29,8 +29,7 @@ podTemplate(containers: [
                   --context `pwd` \
                   --dockerfile Dockerfile \
                   --destination ${appimage}:${apptag} \
-                  --cache=true \
-                  --docker-config=/kaniko/.docker/
+                  --cache=true
                   """
             }
         } //end build
@@ -39,9 +38,11 @@ podTemplate(containers: [
 	              if (DEPLOY) {
                         echo "***** Doing some deployment stuff *********"
                         sh """
-                          kubectl set image deployment/hello-newapp \
-                          hello-newapp=${appimage}:${apptag} \
+                          kubectl set image deployment/${appname} \
+                          ${appname}=${appimage}:${apptag} \
                           --namespace default
+                          kubectl rollout restart deployment/${appname} --namespace default
+                          kubectl rollout status deployment/${appname} --namespace default
                     """
                     }  else {
                         echo "***** NO DEPLOY - Doing somthing else. Testing? *********"
